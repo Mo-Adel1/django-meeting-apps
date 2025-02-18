@@ -11,9 +11,23 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+dotenv.load_dotenv()
+
+# Hardcoded Zoom API credentials (use environment variables in production)
+ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+
+# Zoom API URLs
+TOKEN_URL = "https://zoom.us/oauth/token"
+MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
 
 
 # Quick-start development settings - unsuitable for production
@@ -55,7 +69,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

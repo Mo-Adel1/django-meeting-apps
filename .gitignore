@@ -1,0 +1,5 @@
+meeting/__pycache__/
+meeting/migrations/
+core/__pycache__/
+.env
+
