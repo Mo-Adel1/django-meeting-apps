@@ -3,3 +3,4 @@ meeting/migrations/
 core/__pycache__/
 .env
 
+client_secret.json
