@@ -3,6 +3,7 @@ import base64
 import requests
 from django.shortcuts import render
 from django.http import JsonResponse
+from .models import MeetingSettings
 from django.conf import settings
 from datetime import datetime, timedelta
 import pytz
@@ -62,12 +63,23 @@ def validate_inputs(topic, agenda, duration, date_str, time_str, timezone):
 def create_zoom_meeting(request):
     if request.method == 'POST':
         try:
+            settings = MeetingSettings.objects.get(id=1)
             topic = request.POST.get('topic')
             date_str = request.POST.get('date')  # Expected format: YYYY-MM-DD
             time_str = request.POST.get('time')  # Expected format: HH:MM (24-hour format)
             duration = request.POST.get('duration')
             agenda = request.POST.get('agenda')
-            timezone = request.POST.get('timezone', "Africa/Cairo")  # Default timezone
+            timezone = settings.timezone
+            host_video = settings.host_video
+            participant_video = settings.participant_video
+            audio = settings.audio
+            auto_recording = settings.auto_recording
+            waiting_room = settings.waiting_room
+            join_before_host = settings.join_before_host
+            mute_upon_entry = settings.mute_upon_entry
+            approval_type = settings.approval_type
+            closed_caption = settings.closed_caption
+            registrants_email_notification = settings.registrants_email_notification
             
             # Validate inputs
             errors = validate_inputs(topic, agenda, duration, date_str, time_str, timezone)
@@ -94,22 +106,17 @@ def create_zoom_meeting(request):
                 "timezone": timezone,
                 # "password": generate_secure_password(),  # Generate a secure password
                 "settings": {
-                    "host_video": True,
-                    "participant_video": False,
-                    "audio": "voip",
-                    "auto_recording": "cloud",
-                    "waiting_room": True,  # Enable waiting room
-                    "join_before_host": False,  # Disable joining before host
-                    "mute_upon_entry": True,  # Mute participants on entry
-                    "approval_type": 2,  # Auto-approve registrants (for webinars)
-                    "alternative_hosts": "",  # Add alternative hosts if needed
-                    "closed_caption": True,  # Enable closed captioning
-                    "registrants_email_notification": True  # Notify registrants via email
-                },
-                "tracking_fields": [
-                    {"field": "Department", "value": "Marketing"},
-                    {"field": "Event Name", "value": "Quarterly Review"}
-                ]
+                    "host_video": host_video,
+                    "participant_video": participant_video,
+                    "audio": audio,
+                    "auto_recording": auto_recording,
+                    "waiting_room": waiting_room,
+                    "join_before_host": join_before_host,
+                    "mute_upon_entry": mute_upon_entry,
+                    "approval_type": approval_type,
+                    "closed_caption": closed_caption,
+                    "registrants_email_notification": registrants_email_notification
+                    },
             }
             
             # Step 2: Get Access Token
